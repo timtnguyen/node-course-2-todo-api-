@@ -7,10 +7,12 @@ const {Todo} = require('./../models/todo');
 
 const todos = [{
     _id: new ObjectID(),
-    text: 'First test todo'
+    text: 'First test todo',
 }, {
    _id: new ObjectID(), 
-    text: 'Second test todo'
+    text: 'Second test todo', 
+    completed: true,
+    completedAt: 333
 }];
 
 beforeEach((done) => {
@@ -139,3 +141,64 @@ describe('DELETE /todos/:id', () => {
             .end(done);
     });
 });
+
+describe('PATCH /todos/:id', () => {
+    it('should update todo', (done) => {
+        // grab id of first item 
+        // update text, set completed to true 
+        // 200
+        // text is changed, completed is true and completedAt 
+        // is a number. using toBeA 
+        let hexId = todos[0]._id.toHexString(); 
+        let text = 'Updated todo';
+        
+        request(app) 
+            .patch(`/todos/${hexId}`)
+            .send({
+                text: text,
+                completed: true,
+            })
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.text).toBe(text);
+                expect(res.body.todo.completed).toBe(true);
+            })
+            .end(done); 
+    });
+
+    it('should clear completedAt when todo is not completed', (done) => {
+    //     // grab id of second todo item 
+    //     // update text, set completed to false 
+    //     // 200 
+    //     // text is changed, completedAt is null. to
+        let hexId = todos[1]._id.toHexString(); 
+        let text = 'Another updated text';
+        
+        request(app) 
+            .patch(`/todos/${hexId}`)
+            .send({
+                text: text,
+                completed: false,
+                completedAt: null 
+            })
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.text).toBe(text);
+                expect(res.body.todo.completed).toBe(false);
+                expect(res.body.todo.completeAt).toBeFalsy(); 
+            })
+            .end(done); 
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
